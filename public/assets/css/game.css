@@ -1,31 +1,171 @@
+
+
+@import url('https://fonts.googleapis.com/css?family=Luckiest+Guy&display=swap');
+
 body {
-  background-color: #1ecc86; 
+  background-color: #1ecc86;
+  /*background-color: pink; */
+}
+
+table.table_change {
+	background-color: #08d77c;
+}
+
+.new_border {
+	border-color = red;
 }
 
 table#game_board{
 	margin: auto;
 	border-style: solid;
-	border-width: 10px;
-	border-color: rgb(100,100,100);
+	border-width: 5px;
+	/*border-color: rgb(100,100,100); */
+	border-color: #348863;
 }
 
+/*
 table#game_board td {
 	padding: 5px;
 	border-style: solid;
-	border-width: 1px;
-	border-color: rgb(50,50,50);
+	border-width: 2px;
+	border-color: #348863;
 }
+*/
+
+table td {
+	padding: 5px;
+	border-style: solid;
+	border-width: 2px;
+	border-color: #348863;
+}
+
+
 #messages p{
 	margin: 0px;
 }
 
 td.hovered_over:hover {
-	/* the line below DOES NOT WORK */
 	background: url('../images/hover.gif');
-
-
-
-	/* the line below works */
-	/*background-color: #ff0000; */
 	background-size: 100% 100%;
 }
+
+h1{
+	color: black;
+	font-family: "Helvetica", sans-serif;
+	font-size: 18px;
+	font-weight: bold;
+}
+h2{
+	font-family: 'Luckiest Guy', cursive;
+	color: black;
+	font-size: 60px;
+}
+h3{
+	color: black;
+	font-family: "Helvetica", sans-serif;
+	font-size: 18px;
+}
+
+
+
+
+.feature {
+	-webkit-text-stroke: 2px black;
+}
+
+.evil {
+	color: red;
+}
+
+.good {
+	color: white;
+}
+
+.title_header_vs {
+	color: black;
+	font-family: 'Luckiest Guy', cursive;
+	font-size: 48px;
+
+}
+
+.title_header_good {
+	color: white;
+	font-family: 'Luckiest Guy', cursive;
+	-webkit-text-stroke: 5px black;
+	font-size: 72px;
+
+}
+
+.title_header_evil {
+	color: red;
+	font-family: 'Luckiest Guy', cursive;
+	-webkit-text-stroke: 5px black;
+	font-size: 72px;
+
+}
+
+
+
+.header {
+	font-family: 'Luckiest Guy', cursive;
+	color: white;
+	-webkit-text-stroke: 3px black;;
+	font-size: 48px;
+}
+
+.scores {
+	font-family: 'Luckiest Guy', cursive;
+	-webkit-text-stroke: 2px black;
+	font-size: 40px;
+}
+
+.save {
+	font-family: 'Luckiest Guy', cursive;
+	color: white
+	-webkit-text-stroke: 2px black;;
+	font-size: 36px;
+}
+
+
+.padding_top_tiny {
+	padding-top: 5px;
+}
+.padding_top_sm {
+	padding-top: 10px;
+}
+.padding_top_md {
+	padding-top: 20px;
+}
+.padding_top_lg {
+	padding-top: 30px;
+}
+.padding_btm_sm {
+	padding-bottom: 10px;
+}
+.padding_btm_md {
+	padding-bottom: 20px;
+}
+.padding_btm_lg {
+	padding-bottom: 30px;
+}
+.padding_left_tiny {
+	padding-top: 5px;
+}
+.padding_left_sm {
+	padding-top: 10px;
+}
+.padding_right_tiny {
+	padding-top: 5px;
+}
+.padding_right_sm {
+	padding-top: 10px;
+}
+
+
+
+
+
+
+
+
+

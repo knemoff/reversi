@@ -729,12 +729,15 @@ io.sockets.on('connection', function (socket) {
 			game.board[row][column] = 'w';
 			flip_board('w',row,column,game.board);
 			game.whose_turn = 'black';
+			theme_turn = 'Evil';
 			game.legal_moves = calculate_valid_moves('b',game.board);
+			//console.log('blacksum = ' + blacksum);
 		}
 		else if(color == 'black') {
 			game.board[row][column] = 'b';
 			flip_board('b',row,column,game.board);
 			game.whose_turn = 'white';
+			theme_turn = 'Good';
 			game.legal_moves = calculate_valid_moves('w',game.board);
 		}
 

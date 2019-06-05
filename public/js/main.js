@@ -312,15 +312,32 @@ var old_board = [
 
 var my_color = ' ';
 var interval_timer;
+// vars below were written by Kathy
+var temp_winner = ' ';
+var my_theme = ' ';
+var my_theme_style = '"feature evil">';
+var board_style = ' ';
+var my_timer = ' ';
+var theme_turn = 'Evil';
+var theme_winner = ' ';
+var my_win_status = ' ';
 
 
-	socket.on('game_update',function(payload){
-		console.log('*** Client Log Message: \'game_update\'\n\tpayload: ' + JSON.stringify(payload));
-		/* Check for a good board update */
-		if(payload.result == 'fail'){
-			console.log(payload.message);
-			window.location.href = 'lobby.html?username=' + username;
-			return;
+
+
+/* GAME UPDATE FUNCTION */
+/* GAME UPDATE FUNCTION */
+/* GAME UPDATE FUNCTION */
+/* GAME UPDATE FUNCTION */
+
+socket.on('game_update',function(payload){
+	//Kathy hid the line below bc it was annoying
+	//console.log('*** Client Log Message: \'game_update\'\n\tpayload: ' + JSON.stringify(payload));
+	/* Check for a good board update */
+	if(payload.result == 'fail'){
+		console.log(payload.message);
+		window.location.href = 'lobby.html?username=' + username;
+		return;
 	}
 
 	/* Check for a good lboard in the payload */
@@ -333,9 +350,13 @@ var interval_timer;
 	/* Update my color */
 	if(socket.id == payload.game.player_white.socket) {
 		my_color = 'white';
+		my_theme = 'Good'; //this tells the user if they are Good or Evil
+		my_theme_style = '"feature good">'; // this calls either the good or evil css class to color the user's theme
 	}	
 	else if(socket.id == payload.game.player_black.socket) {
 		my_color = 'black';
+		my_theme = 'Evil'; //this tells the user if they are Good or Evil
+		my_theme_style = '"feature evil">'; // this calls either the good or evil css class to color the user's theme
 	}
 	else {
 		/* Something weird is going on, like three people playing at once */
@@ -345,12 +366,30 @@ var interval_timer;
 	}
 
 
-$('#my_color').html('<h3 id = "my_color">I am ' + my_color + '</h3>');
-$('#my_color').append('<h4>It is ' + payload.game.whose_turn + '\'s turn. Elapsed time <span id="elapsed"</span></h4>');
+	/* Kathy code to declare theme color var so it will say Evil or Good for turn instead of black or white */
+	if (payload.game.whose_turn === 'white') {
+			theme_turn = 'Good';
+	}
+	else if (payload.game.whose_turn === 'black') {
+			theme_turn = 'Evil';
+	}
 
-clearInterval(interval_timer);
-interval_timer = setInterval(function(last_time){
-			return function(){
+
+
+	// Original code that had my_color 
+	//$('#my_color').html('<h3 id = "my_color">I am ' + my_color + '</h3>');
+	$('#my_color').html(' ');
+	//$('#my_theme').html('<h2>You are playing for <br><span class="feature evil">' + my_theme + '.</span></h2>');
+	$('#my_theme').html('<h2>'+'You are <span class=' + my_theme_style + my_theme + '.</span></h2>');
+	// line below is Don's original player and time readout
+	//$('#my_color').append('<h4>It is ' + payload.game.whose_turn + '\'s turn. Elapsed time <span id="elapsed"</span></h4>');
+	// hiding the line below because it helped me figure out whose turn
+	//$('#my_timer').html('<h5>(my_timer)It is ' + payload.game.whose_turn + '\'s turn. Elapsed time is <span id="elapsed"</span></h5>');
+	$('#my_timer2').html('<h5>It is ' + theme_turn + '\'s turn. Elapsed time is <span id="elapsed"</span></h5>');
+
+	clearInterval(interval_timer);
+	interval_timer = setInterval(function(last_time){
+		return function(){
 			//Do the work of updating the UI
 			var d = new Date();
 			var elapsedmilli = d.getTime() - last_time;
@@ -363,8 +402,8 @@ interval_timer = setInterval(function(last_time){
 			else{
 				$('#elapsed').html(minutes+':'+seconds);
 			}
-			//
-			}} (payload.game.last_move_time)
+		}
+	} (payload.game.last_move_time)
 			, 1000);
 
 	/* Animate changes to the board */
@@ -372,7 +411,49 @@ interval_timer = setInterval(function(last_time){
 	var blacksum = 0;
 	var whitesum = 0;
 
+//moved code from below
+	happy_black_token = '<img src = "assets/images/empty_to_black.gif" alt="black square" />';
+	happy_white_token = '<img src = "assets/images/empty_to_white.gif" alt="white square" />';
+	sad_black_token = '<img src = "assets/images/empty_to_black_sad.gif" alt="sad black square" />';
+	sad_white_token = '<img src = "assets/images/empty_to_white_sad.gif" alt="sad white square" />';
+	var current_white_token;
+	var current_black_token;
+
 	var row, column;
+	for(row = 0; row < 8; row++){
+		for(column = 0; column <8; column++){
+			if(board[row][column] == 'b') {
+				blacksum++;
+				//console.log('in blk counter, blacksum = ' + blacksum);
+			}
+			if(board[row][column] == 'w') {
+				whitesum++;
+				//console.log('in wht counter, whitesum = ' + whitesum);
+			}
+		}
+	}
+	var scorediff = 0; //try to get this to update
+	scorediff = blacksum - whitesum;
+	//console.log('NEW NEW score diff = ' + scorediff);
+	if(scorediff < 0) {
+		temp_winner = 'white_player';		
+		current_black_token = sad_black_token;
+		current_white_token = happy_white_token;
+
+	} 
+	else if (scorediff > 0) {
+		temp_winner = 'black_player';
+		current_black_token = happy_black_token;
+		current_white_token = sad_white_token;
+	}
+	else if (scorediff == 0) {
+		temp_winner = 'nobody';
+		current_black_token = happy_black_token;
+		current_white_token = happy_white_token;
+	}
+
+	blacksum=0;
+	whitesum=0;
 	for(row = 0; row < 8; row++){
 		for(column = 0; column <8; column++){
 			if(board[row][column] == 'b') {
@@ -382,48 +463,68 @@ interval_timer = setInterval(function(last_time){
 				whitesum++;
 			}
 
-			/* If a board space has changed */
-			if(old_board[row][column] != board [row][column]) {
-				if(old_board[row][column] == '?' && board[row][column] == ' ') {
-					$('#' + row + '_' + column).html('<img src = "assets/images/empty.gif" alt = "empty square"/>');
-				}
-				else if(old_board[row][column] == '?' && board[row][column] == 'w') {
-					$('#' + row + '_' + column).html('<img src = "assets/images/empty_to_white.gif" alt="white square" />');
-				}
-				else if(old_board[row][column] == '?' && board[row][column] == 'b') {
-					$('#' + row +'_' + column).html('<img src = "assets/images/empty_to_black.gif" alt="black square" />');
-				}
-				else if(old_board[row][column] == ' ' && board[row][column] == 'w') {
-					$('#' + row + '_' + column).html('<img src = "assets/images/empty_to_white.gif" alt="white square" />');
-				}
-				else if(old_board[row][column] == ' ' && board[row][column] == 'b') {
-					$('#' + row + '_' + column).html('<img src = "assets/images/empty_to_black.gif" alt="black square" />');
-				}
-				else if(old_board[row][column] == 'w' && board[row][column] == ' ') {
-					$('#' + row + '_' + column).html('<img src = "assets/images/white_to_empty.gif" alt="empty square" />');
-				}
-				else if(old_board[row][column] == 'b' && board[row][column] == ' ') {
-					$('#' + row + '_' + column).html('<img src = "assets/images/black_to_empty.gif" alt="empty square" />');
-				}
-				else if(old_board[row][column] == 'w' && board[row][column] == 'b') {
-					$('#' + row +'_' + column).html('<img src = "assets/images/white_to_black.gif" alt="black square" />');
-				}
-				else if(old_board[row][column] == 'b' && board[row][column] == 'w') {
-					$('#' + row + '_' + column).html('<img src = "assets/images/black_to_white.gif" alt="white square" />');
-				}
-				else {
-					 $('#' + row +  '_' + column).html('<img src = "assets/images/error.gif" alt="error" />');
-				}
-			}
+				// Remove Don's code below so the board refreshes every time even if there isn't a change
+				// If a board space has changed 
+				//if(old_board[row][column] != board [row][column]) {
 
-			/* Set up interactivity */
-			$('#' + row + '_' + column).off('click');
-			$('#' + row + '_' + column).removeClass('hovered_over');
 
-			if(payload.game.whose_turn === my_color){
-				if(payload.game.legal_moves[row][column] === my_color.substr(0,1)){
-					$('#' + row + '_' + column).addClass('hovered_over');
-					$('#' + row + '_' + column).click(function(r,c) {
+					if(old_board[row][column] == '?' && board[row][column] == ' ') {
+						$('#' + row + '_' + column).html('<img src = "assets/images/empty.gif" alt = "empty square"/>');
+					}
+					else if(old_board[row][column] == '?' && board[row][column] == 'w') {
+						$('#' + row + '_' + column).html(current_white_token);
+					}
+					else if(old_board[row][column] == '?' && board[row][column] == 'b') {
+						$('#' + row +'_' + column).html(current_black_token);
+					}
+					else if(old_board[row][column] == ' ' && board[row][column] == 'w') {
+						$('#' + row + '_' + column).html(current_white_token);
+					}
+					else if(old_board[row][column] == ' ' && board[row][column] == 'b') {
+						$('#' + row +'_' + column).html(current_black_token);
+					}
+					else if(old_board[row][column] == 'w' && board[row][column] == ' ') {
+						$('#' + row + '_' + column).html('<img src = "assets/images/white_to_empty.gif" alt="empty square" />');
+					}
+					else if(old_board[row][column] == 'b' && board[row][column] == ' ') {
+						$('#' + row + '_' + column).html('<img src = "assets/images/black_to_empty.gif" alt="empty square" />');
+					}
+					else if(old_board[row][column] == 'w' && board[row][column] == 'b') {
+						$('#' + row +'_' + column).html(current_black_token);
+					}
+					else if(old_board[row][column] == 'b' && board[row][column] == 'w') {
+						$('#' + row + '_' + column).html(current_white_token);
+					}
+					else if(old_board[row][column] == ' ' && board[row][column] == ' ') {
+						$('#' + row + '_' + column).html('<img src = "assets/images/empty.gif" alt = "empty square"/>');
+					}
+					else if(old_board[row][column] == 'b' && board[row][column] == 'b') {
+						//$('#' + row +'_' + column).html(current_black_token);
+						$('#' + row +'_' + column).html(current_black_token) + '_still';
+					}
+					else if(old_board[row][column] == 'w' && board[row][column] == 'w') {
+						//$('#' + row +'_' + column).html(current_white_token);
+						$('#' + row +'_' + column).html(current_white_token) + '_still';
+					}
+					else {
+						 $('#' + row +  '_' + column).html('<img src = "assets/images/error.gif" alt="error" />');
+					}
+				//}
+				
+
+
+				/* Set up interactivity */
+				$('#' + row + '_' + column).off('click');
+				$('#' + row + '_' + column).removeClass('hovered_over');
+
+				if(payload.game.whose_turn === my_color){
+					if(payload.game.legal_moves[row][column] === my_color.substr(0,1)){
+						//trial
+						//$('td').addClass('new_border');
+						// this works, but come back after figuring out how to select for the border
+						//$('#game_board').addClass('table_change'); //Kathy code
+						$('#' + row + '_' + column).addClass('hovered_over');
+						$('#' + row + '_' + column).click(function(r,c) {
 								return function() {
 									var payload = {};
 									payload.row = r;
@@ -433,15 +534,54 @@ interval_timer = setInterval(function(last_time){
 									socket.emit('play_token',payload);
 								};
 					}(row,column));
+				} else
+				if (payload.game.whose_turn != my_color){
+					//$('#game_board').removeClass('table_change');
 				}
 			}
-		}
+		} 
+
 	}
+
+	
+
+	//this puts the score at the top of the page
 	$('#blacksum').html(blacksum);
 	$('#whitesum').html(whitesum);
 
+	//KATHY TRYING TO WRITE TO THE HTML	- THIS WORKS !!!!!!!!!!!!
+	$('#scorediff').html('<h5 id = "scorediff">Score diff = ' + scorediff + '</h5>');
+	$('#current_winner').html('<h5 id = "current_winner">Current winner is <b>' + temp_winner + '</b></h5>');
+
+	$('#gametop_black_token').html(current_black_token);
+	$('#gametop_white_token').html(current_white_token);
+	//END KATHY CODE
+
+	/* KATHY CODE - DOESN'T WORK */
+	/* KATHY CODE - DOESN'T WORK */
+	/* KATHY CODE - DOESN'T WORK */
+	/* KATHY CODE - DOESN'T WORK */
+	/* I'm going to try moving it into the code that sets the tokens */
+		/*
+		if (temp_winner === 'black_player') {
+			current_black_token = happy_black_token;
+			current_white_token = sad_white_token;
+		} else if (temp_winner === 'white_player') {		
+			current_black_token = sad_black_token;
+			current_white_token = happy_white_token;
+		} 
+		*/
+
+
 	old_board = board;
 });
+
+/* END GAME UPDATE FUNCTION - i think.....*/
+/* END GAME UPDATE FUNCTION - i think.....*/
+/* END GAME UPDATE FUNCTION - i think.....*/
+/* END GAME UPDATE FUNCTION - i think.....*/
+
+
 
 socket.on('play_token_response',function(payload){
 
@@ -464,9 +604,23 @@ socket.on('game_over',function(payload){
 		return;
 	}
 
+
+	/* Kathy code: if then's to change the winnder to the theme */
+	if(payload.who_won === 'black') {
+		theme_winner = 'Evil';
+	} else
+	if (payload.who_won === 'white') {
+		theme_winner = 'Good';
+	}
+
+
 	/* Jump to a new page */
-	$('#game_over').html('<h1>Game Over</h1><h2>' + payload.who_won + ' won!</h2>');
+	
+	// Kathy code to theme the game winner message
+	$('#game_over').html('<h1>Game Over</h1><h2>' + theme_winner + ' won!</h2>');
+	//$('#game_over').html('<h1>Game Over</h1><h2>' + payload.who_won + ' won!</h2>');
 	$('#game_over').append('<a href="lobby.html?username=' + username + '" class="btn btn-success btn-lg active" role="button" aria-pressed="true">Return to the lobby</a>');
+
 
 });
 
